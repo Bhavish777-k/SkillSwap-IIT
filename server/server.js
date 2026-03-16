@@ -68,8 +68,8 @@ app.listen(PORT, () => {
   console.log(`
 ╔════════════════════════════════════════╗
 ║   SkillSwap IIT Server Running         ║
-║   Port: ${PORT}                         ║
-║   Environment: ${process.env.NODE_ENV || 'development'}            ║
+║   Port: ${PORT}                           ║
+║   Environment: ${process.env.NODE_ENV || 'development'}             ║
 ╚════════════════════════════════════════╝
   `);
 });

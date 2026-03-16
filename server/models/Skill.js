@@ -44,6 +44,11 @@ const skillSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
+  pointValue: {
+  type: Number,
+  required: true,
+  default: 10 // fallback if not provided
+},
   isActive: {
     type: Boolean,
     default: true

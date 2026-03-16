@@ -68,13 +68,14 @@ export const getSkill = async (req, res, next) => {
  */
 export const createSkill = async (req, res, next) => {
   try {
-    const { name, category, description, icon } = req.body;
+    const { name, category, description, icon,pointValue } = req.body;
 
     const skill = await Skill.create({
       name,
       category,
       description,
-      icon
+      icon,
+      pointValue
     });
 
     res.status(201).json({

@@ -1,6 +1,7 @@
 import Session from '../models/Session.js';
 import MatchRequest from '../models/MatchRequest.js';
 import { deductPoints, addPoints } from './pointsController.js';
+import Skill from '../models/Skill.js';
 
 /**
  * @desc    Create new session
@@ -47,15 +48,25 @@ export const createSession = async (req, res, next) => {
       });
     }
 
-    // Calculate points cost based on duration (10 points per hour)
-    const pointsCost = Math.ceil(duration / 60) * 10;
+    // Fetch skill details from match request
+    const skill = await Skill.findById(matchRequest.skillNeeded);
+
+    if (!skill) {
+      return res.status(404).json({
+        success: false,
+        message: 'Skill not found'
+      });
+    }
+
+    // Points cost = duration (hours) × skill pointValue
+    const pointsCost = Math.ceil(duration / 60) * skill.pointValue;
 
     // Deduct points from the learner (requester)
     try {
       await deductPoints(
         matchRequest.requester.toString(),
         pointsCost,
-        `Session booking: ${duration} minutes`,
+        `Session booking: ${duration} minutes for skill ${skill.name}`,
         null // We'll update this with session ID after creation
       );
     } catch (error) {
@@ -86,13 +97,104 @@ export const createSession = async (req, res, next) => {
 
     res.status(201).json({
       success: true,
-      message: `Session created successfully. ${pointsCost} points deducted from learner.`,
+      message: `Session created successfully. ${pointsCost} points deducted for ${duration} minutes of ${skill.name}.`,
       data: populatedSession
     });
   } catch (error) {
     next(error);
   }
 };
+// /**
+//  * @desc    Create new session
+//  * @route   POST /api/sessions
+//  * @access  Private
+//  */
+// export const createSession = async (req, res, next) => {
+//   try {
+//     const {
+//       matchRequestId,
+//       scheduledDate,
+//       duration,
+//       mode,
+//       meetingLink,
+//       location,
+//       notes
+//     } = req.body;
+
+//     // Verify match request exists and is accepted
+//     const matchRequest = await MatchRequest.findById(matchRequestId);
+
+//     if (!matchRequest) {
+//       return res.status(404).json({
+//         success: false,
+//         message: 'Match request not found'
+//       });
+//     }
+
+//     if (matchRequest.status !== 'accepted') {
+//       return res.status(400).json({
+//         success: false,
+//         message: 'Can only create sessions for accepted match requests'
+//       });
+//     }
+
+//     // Verify user is part of the match
+//     const isRequester = matchRequest.requester.toString() === req.user.id;
+//     const isMentor = matchRequest.mentor.toString() === req.user.id;
+
+//     if (!isRequester && !isMentor) {
+//       return res.status(403).json({
+//         success: false,
+//         message: 'Not authorized to create session for this match'
+//       });
+//     }
+
+//     // Calculate points cost based on duration (10 points per hour)
+//     const pointsCost = Math.ceil(duration / 60) * 10;
+
+//     // Deduct points from the learner (requester)
+//     try {
+//       await deductPoints(
+//         matchRequest.requester.toString(),
+//         pointsCost,
+//         `Session booking: ${duration} minutes`,
+//         null // We'll update this with session ID after creation
+//       );
+//     } catch (error) {
+//       return res.status(400).json({
+//         success: false,
+//         message: error.message
+//       });
+//     }
+
+//     // Create session
+//     const session = await Session.create({
+//       matchRequest: matchRequestId,
+//       learner: matchRequest.requester,
+//       mentor: matchRequest.mentor,
+//       skill: matchRequest.skillNeeded,
+//       scheduledDate,
+//       duration,
+//       mode,
+//       meetingLink,
+//       location,
+//       notes
+//     });
+
+//     const populatedSession = await Session.findById(session._id)
+//       .populate('learner', 'name avatar email')
+//       .populate('mentor', 'name avatar email')
+//       .populate('skill');
+
+//     res.status(201).json({
+//       success: true,
+//       message: `Session created successfully. ${pointsCost} points deducted from learner.`,
+//       data: populatedSession
+//     });
+//   } catch (error) {
+//     next(error);
+//   }
+// };
 
 /**
  * @desc    Get user's sessions
@@ -234,6 +336,64 @@ export const updateSession = async (req, res, next) => {
  * @route   PUT /api/sessions/:id/complete
  * @access  Private
  */
+// export const completeSession = async (req, res, next) => {
+//   try {
+//     const session = await Session.findById(req.params.id);
+
+//     if (!session) {
+//       return res.status(404).json({
+//         success: false,
+//         message: 'Session not found'
+//       });
+//     }
+
+//     // Verify user is the mentor
+//     if (session.mentor.toString() !== req.user.id) {
+//       return res.status(403).json({
+//         success: false,
+//         message: 'Only mentor can mark session as completed'
+//       });
+//     }
+
+//     session.status = 'completed';
+//     session.completedAt = new Date();
+//     await session.save();
+
+//     // Award points to mentor after session completion
+//     const pointsEarned = Math.ceil(session.duration / 60) * 10;
+//     try {
+//       console.log(`Awarding ${pointsEarned} points to mentor ${session.mentor.toString()}`);
+//       await addPoints(
+//         session.mentor.toString(),
+//         pointsEarned,
+//         'earned',
+//         `Teaching session completed: ${session.duration} minutes`,
+//         session._id
+//       );
+//       console.log(`Successfully awarded ${pointsEarned} points to mentor`);
+//     } catch (error) {
+//       console.error('Error awarding points to mentor:', error.message);
+//     }
+
+//     const populatedSession = await Session.findById(session._id)
+//       .populate('learner', 'name avatar email')
+//       .populate('mentor', 'name avatar email')
+//       .populate('skill');
+
+//     res.status(200).json({
+//       success: true,
+//       message: `Session marked as completed. ${pointsEarned} points awarded to mentor!`,
+//       data: populatedSession
+//     });
+//   } catch (error) {
+//     next(error);
+//   }
+// };
+/**
+ * @desc    Mark session as completed
+ * @route   PUT /api/sessions/:id/complete
+ * @access  Private (mentor only)
+ */
 export const completeSession = async (req, res, next) => {
   try {
     const session = await Session.findById(req.params.id);
@@ -257,15 +417,25 @@ export const completeSession = async (req, res, next) => {
     session.completedAt = new Date();
     await session.save();
 
-    // Award points to mentor after session completion
-    const pointsEarned = Math.ceil(session.duration / 60) * 10;
+    // Fetch skill details
+    const skill = await Skill.findById(session.skill);
+    if (!skill) {
+      return res.status(404).json({
+        success: false,
+        message: 'Skill not found'
+      });
+    }
+
+    // Award points = duration (hours) × skill pointValue
+    const pointsEarned = Math.ceil(session.duration / 60) * skill.pointValue;
+
     try {
       console.log(`Awarding ${pointsEarned} points to mentor ${session.mentor.toString()}`);
       await addPoints(
         session.mentor.toString(),
         pointsEarned,
         'earned',
-        `Teaching session completed: ${session.duration} minutes`,
+        `Teaching session completed: ${session.duration} minutes for skill ${skill.name}`,
         session._id
       );
       console.log(`Successfully awarded ${pointsEarned} points to mentor`);
@@ -280,14 +450,13 @@ export const completeSession = async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      message: `Session marked as completed. ${pointsEarned} points awarded to mentor!`,
+      message: `Session marked as completed. ${pointsEarned} points awarded to mentor for teaching ${skill.name}!`,
       data: populatedSession
     });
   } catch (error) {
     next(error);
   }
 };
-
 /**
  * @desc    Cancel session
  * @route   PUT /api/sessions/:id/cancel
