@@ -15,6 +15,7 @@ import chatRoutes from './routes/chatRoutes.js';
 import reviewRoutes from './routes/reviewRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 import pointsRoutes from './routes/pointsRoutes.js';
+import leaderboardRoutes from './routes/leaderboardRoutes.js';
 
 // Load environment variables
 dotenv.config();
@@ -33,11 +34,11 @@ app.use(morgan('dev'));
 
 // Health check route
 app.get('/api/health', (req, res) => {
-  res.json({ 
-    status: 'OK', 
-    message: 'SkillSwap API is running',
-    timestamp: new Date().toISOString()
-  });
+    res.json({
+        status: 'OK',
+        message: 'SkillSwap API is running',
+        timestamp: new Date().toISOString()
+    });
 });
 
 // API Routes
@@ -50,22 +51,23 @@ app.use('/api/chats', chatRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/points', pointsRoutes);
+app.use('/api/leaderboard', leaderboardRoutes);
 
 // Error handling middleware (must be last)
 app.use(errorHandler);
 
 // 404 handler
 app.use((req, res) => {
-  res.status(404).json({ 
-    success: false, 
-    message: 'Route not found' 
-  });
+    res.status(404).json({
+        success: false,
+        message: 'Route not found'
+    });
 });
 
 // Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`
+    console.log(`
 ╔════════════════════════════════════════╗
 ║   SkillSwap IIT Server Running         ║
 ║   Port: ${PORT}                           ║
