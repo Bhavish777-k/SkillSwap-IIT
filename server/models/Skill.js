@@ -13,7 +13,7 @@ const skillSchema = new mongoose.Schema({
     required: [true, 'Category is required'],
     enum: [
       'Programming',
-      'Web Development',
+      'Web Frameworks',
       'Mobile Development',
       'Data Science',
       'Machine Learning',
@@ -25,6 +25,11 @@ const skillSchema = new mongoose.Schema({
       'Music',
       'Languages',
       'Academic',
+      'Android Frameworks',
+      'Creative',
+      'AI',
+      'Soft Skills',
+      'Tools',
       'Other'
     ]
   },
