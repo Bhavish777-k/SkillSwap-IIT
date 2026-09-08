@@ -17,6 +17,7 @@ import ChatsPage from './pages/ChatsPage';
 import AdminPage from './pages/AdminPage';
 import PointsPage from './pages/PointsPage';
 import LeaderboardPage from './pages/LeaderboardPage';
+import AIRoadmapPage from './pages/AIRoadmapPage';
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
               <Route path="/leaderboard" element={<LeaderboardPage />} />
+              <Route path="/ai-roadmap" element={<AIRoadmapPage />} />
 
               {/* Protected Routes */}
               <Route

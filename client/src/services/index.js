@@ -294,3 +294,12 @@ export const leaderboardService = {
         return response.data;
     },
 };
+export const roadmapService = {
+    generateRoadmap: async(targetRole) => {
+        const response = await API.post('/roadmap/send', {
+            targetRole
+        });
+
+        return response.data;
+    },
+};
