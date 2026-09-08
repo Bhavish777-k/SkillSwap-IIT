@@ -27,7 +27,7 @@ export default defineConfig(({ mode }) => {
       port: 3000,
       proxy: {
         '/api': {
-          target: env.VITE_REACT_BACKEND_URL, // use the env variable
+          target: "https://skillswap-iit.onrender.com", // use the env variable
           changeOrigin: true,
         }
       }
