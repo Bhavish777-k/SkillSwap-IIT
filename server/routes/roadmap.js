@@ -8,6 +8,8 @@ dotenv.config();
 
 const router = express.Router();
 
+// const FASTAPI_URL = process.env.FASTAPI_URL || "https://ai-recommedation-microservice.onrender.com/api/roadmap";
+// const FASTAPI_API_KEY = process.env.FASTAPI_API_KEY || "";
 const FASTAPI_URL = (process.env.FASTAPI_URL || "https://ai-recommedation-microservice.onrender.com/api/roadmap")
   .trim()
   .replace(/^['"]|['"]$/g, "");
@@ -38,43 +40,20 @@ router.post("/send", protect, async (req, res) => {
 
     console.log("Calling FastAPI:", FASTAPI_URL, "payload:", payload);
 
-    const response = await axios.post(FASTAPI_URL, payload, {
-      headers,
-      timeout: 90000
-    });
+    const response = await axios.post(FASTAPI_URL, payload, { headers, timeout: 120000 });
 
     return res.status(response.status).json(response.data);
   } catch (err) {
-    console.error("Roadmap send error:", {
-      message: err.message,
-      code: err.code,
-      status: err.response?.status,
-      response: err.response?.data
-    });
+    console.error("Roadmap send error:", err?.response?.data || err.message);
 
     if (err.response && err.response.data) {
       const status = err.response.status || 500;
-      const responseData = err.response.data;
-      const message = responseData.message || responseData.detail || "AI roadmap service failed";
-      return res.status(status).json({
-        success: false,
-        message: typeof message === "string" ? message : JSON.stringify(message),
-        detail: responseData.detail
-      });
+      return res.status(status).json(err.response.data);
     }
 
-    if (err.code === "ECONNABORTED" || err.code === "ETIMEDOUT") {
-      return res.status(504).json({
-        success: false,
-        message: "The AI roadmap service timed out. Please try again."
-      });
-    }
-
-    return res.status(502).json({
-      success: false,
-      message: "The AI roadmap service could not be reached."
-    });
+    return res.status(500).json({ success: false, message: "Failed to generate roadmap" });
   }
 });
 
 export default router;
+
