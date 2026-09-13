@@ -8,14 +8,8 @@ dotenv.config();
 
 const router = express.Router();
 
-// const FASTAPI_URL = process.env.FASTAPI_URL || "https://ai-recommedation-microservice.onrender.com/api/roadmap";
-// const FASTAPI_API_KEY = process.env.FASTAPI_API_KEY || "";
-const FASTAPI_URL = (process.env.FASTAPI_URL || "https://ai-recommedation-microservice.onrender.com/api/roadmap")
-  .trim()
-  .replace(/^['"]|['"]$/g, "");
-const FASTAPI_API_KEY = (process.env.FASTAPI_API_KEY || "")
-  .trim()
-  .replace(/^['"]|['"]$/g, "");
+const FASTAPI_URL = process.env.FASTAPI_URL || "https://ai-recommedation-microservice.onrender.com/api/roadmap";
+const FASTAPI_API_KEY = process.env.FASTAPI_API_KEY || "";
 
 router.post("/send", protect, async (req, res) => {
   try {
@@ -56,4 +50,3 @@ router.post("/send", protect, async (req, res) => {
 });
 
 export default router;
-
