@@ -8,12 +8,8 @@ dotenv.config();
 
 const router = express.Router();
 
-const FASTAPI_URL = (process.env.FASTAPI_URL || "https://ai-recommedation-microservice.onrender.com/api/roadmap")
-  .trim()
-  .replace(/^['"]|['"]$/g, "");
-const FASTAPI_API_KEY = (process.env.FASTAPI_API_KEY || "")
-  .trim()
-  .replace(/^['"]|['"]$/g, "");
+const FASTAPI_URL = process.env.FASTAPI_URL || "https://ai-recommedation-microservice.onrender.com/api/roadmap";
+const FASTAPI_API_KEY = process.env.FASTAPI_API_KEY || "";
 
 const wait = (milliseconds) =>
   new Promise((resolve) => setTimeout(resolve, milliseconds));
@@ -47,7 +43,7 @@ router.post("/send", protect, async (req, res) => {
       try {
         response = await axios.post(FASTAPI_URL, payload, {
           headers,
-          timeout: 90000
+          timeout: 120000
         });
         break;
       } catch (error) {
@@ -91,6 +87,7 @@ router.post("/send", protect, async (req, res) => {
       success: false,
       message: "The AI roadmap service could not be reached."
     });
+  }
   }
 });
 
