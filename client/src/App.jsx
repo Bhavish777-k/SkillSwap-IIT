@@ -32,7 +32,14 @@ function App() {
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
               <Route path="/leaderboard" element={<LeaderboardPage />} />
-              <Route path="/ai-roadmap" element={<AIRoadmapPage />} />
+              <Route
+                path="/ai-roadmap"
+                element={
+                  <ProtectedRoute>
+                    <AIRoadmapPage />
+                  </ProtectedRoute>
+                }
+              />
 
               {/* Protected Routes */}
               <Route
