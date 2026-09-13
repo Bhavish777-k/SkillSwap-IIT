@@ -27,7 +27,9 @@ export default defineConfig(({ mode }) => {
       port: 3000,
       proxy: {
         '/api': {
-          target: env.VITE_REACT_BACKEND_URL, // use the env variable
+          target: (env.VITE_REACT_BACKEND_URL || 'http://localhost:5000')
+            .replace(/\/$/, '')
+            .replace(/\/api$/, ''),
           changeOrigin: true,
         }
       }

@@ -1,7 +1,11 @@
 import axios from 'axios';
 
+const backendUrl = (import.meta.env.VITE_REACT_BACKEND_URL || 'http://localhost:5000')
+    .replace(/\/$/, '')
+    .replace(/\/api$/, '');
+
 const API = axios.create({
-    baseURL: 'https://skillswap-iit.onrender.com/api',
+    baseURL: `${backendUrl}/api`,
     headers: {
         'Content-Type': 'application/json',
     },
