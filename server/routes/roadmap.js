@@ -33,7 +33,7 @@ router.post("/send", protect, async (req, res) => {
     const payload = {
       user_id: String(user._id),
       target_role: targetRole,
-      model: "gemini-flash-latest"
+      model: "gemini-3.1-flash-live"
     };
 
     const headers = { "Content-Type": "application/json" };
